@@ -1,0 +1,78 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  user
+  admin
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(user)
+  apikeys       ApiKey[]
+
+  accounts Account[]
+
+  instancias Instancias[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ApiKey {
+  id      String    @id @default(cuid())
+  url     String   // Campo para almacenar la URL
+  key     String   // Campo para almacenar la API Key
+  userId  String   // Referencia al usuario
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) // Opcional: fecha de creación
+  updatedAt DateTime @updatedAt       // Opcional: fecha de actualización
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model VerificationToken {
+  identifier String   @unique
+  token      String
+  expires    DateTime
+
+  @@id([identifier])
+}
+
+model Instancias {
+  id       Int    @id @default(autoincrement())
+  instanceName   String @unique
+  userId   String
+  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
