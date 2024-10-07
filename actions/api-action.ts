@@ -40,33 +40,66 @@ export async function createInstance(data: FormData) {
   const userId = data.get('userId') as string;
 
   try {
-      // Validación de campos
-      if (!instanceName || !userId) {
-          throw new Error('Todos los campos son obligatorios');
-      }
+    // Validación de campos
+    if (!instanceName || !userId) {
+      throw new Error('Todos los campos son obligatorios');
+    }
 
-      // Verificar si el usuario ya tiene una instancia activa
-      const instanciaActiva = await verificarInstanciaActiva(userId);
-      if (instanciaActiva) {
-          return { success: false, message: "El usuario ya tiene una instancia activa.", instancia: instanciaActiva };
-      }
+    // Verificar si el usuario ya tiene una instancia activa
+    const instanciaActiva = await verificarInstanciaActiva(userId);
+    if (instanciaActiva) {
+      return { success: false, message: "El usuario ya tiene una instancia activa.", instancia: instanciaActiva };
+    }
 
-      // Crear la nueva instancia si no existe una
-      const nuevaInstancia = await db.instancias.create({
-          data: {
-              instanceName,
-              userId,
-          },
-      });
+    // Obtener la clave de API y el server-url del administrador desde la base de datos
+    const apiKeyRecord = await db.apiKey.findFirst();
 
-      // Revalidar la página si es necesario
-      revalidatePath('/agregar-api');
+    if (!apiKeyRecord) {
+      throw new Error('No se encontró una clave API para este usuario.');
+    }
 
-      return { success: true, message: "Instancia creada exitosamente.", instancia: nuevaInstancia };
+    const { key: apiKey, url: serverUrl } = apiKeyRecord; // Extraemos la apiKey y serverUrl de la base de datos
+
+    // Configurar las opciones para la llamada a la API externa
+    const options = {
+      method: 'POST',
+      headers: {
+        'apikey': apiKey,  // Usar la clave API obtenida de la base de datos
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        instanceName: instanceName,
+        qrcode: true,
+        integration: "WHATSAPP-BAILEYS"
+      })
+    };
+
+    // Realizar la llamada a la API externa usando el serverUrl
+    const response = await fetch(`https://${serverUrl}/instance/create`, options);
+    const apiResult = await response.json();
+
+    // Manejo de errores en la respuesta de la API
+    if (!response.ok) {
+      throw new Error(apiResult.message || 'Error al crear la instancia en la API.');
+    }
+
+    // Guardar la nueva instancia en la base de datos si la creación en la API fue exitosa
+    const nuevaInstancia = await db.instancias.create({
+      data: {
+        instanceName,
+        userId
+      },
+    });
+
+    // Revalidar la página si es necesario
+    revalidatePath('/agregar-api');
+
+    return { success: true, message: "Instancia creada exitosamente.", instancia: nuevaInstancia, apiResult };
   } catch (error: any) {
-      return { success: false, message: error.message || "Error al crear la instancia." };
+    return { success: false, message: error.message || "Error al crear la instancia." };
   }
 }
+
 
 // Función para verificar si el usuario ya tiene una instancia
 export async function verificarInstanciaActiva(userId: string) {
@@ -76,3 +109,4 @@ export async function verificarInstanciaActiva(userId: string) {
 
     return instanciaActiva;
 }
+
