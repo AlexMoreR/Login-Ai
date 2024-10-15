@@ -11,13 +11,8 @@ export const navLinks = [
     },
     {
       label: "Crear IA",
-      route: "/transformations/add/fill",
+      route: "/ia",
       icon: "/assets/icons/stars.svg",
-    },
-    {
-      label: "Whatsapp",
-      route: "/transformations/add/remove",
-      icon: "/assets/icons/scan.svg",
     },
     {
       label: "Herramientas",

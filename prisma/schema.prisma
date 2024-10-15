@@ -74,5 +74,6 @@ model Instancias {
   id       Int    @id @default(autoincrement())
   instanceName   String @unique
   userId   String
+  instanceId String
   user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

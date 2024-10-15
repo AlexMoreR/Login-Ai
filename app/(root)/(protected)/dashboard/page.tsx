@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 import { UserInfo } from "@/components/user-info";
 import FormInstance from "@/components/form-Instance";
+import WhatsAppInstanceStatus from "@/components/form-qr";
 
 
 export default async function DashboardPage() {
@@ -21,8 +22,10 @@ export default async function DashboardPage() {
   }
 
   return (
+    <>
       <FormInstance userId={user.id} />
+      <WhatsAppInstanceStatus userId={user.id} />
+    </>
 
-    
   );
 }
