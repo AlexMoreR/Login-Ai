@@ -4,7 +4,6 @@ import React from 'react'
 const ProfilePage = () => {
   return (
     <div>
-      <Sidebar/>
       Profilepage
     </div>
   )

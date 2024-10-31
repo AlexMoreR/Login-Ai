@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 import LogoutButton from '../logout-button'
+import { ModeToggle } from '../theme-toggle-button'
 
 const Sidebar = () => {
 

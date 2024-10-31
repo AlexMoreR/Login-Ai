@@ -11,7 +11,7 @@ export const navLinks = [
     },
     {
       label: "Crear IA",
-      route: "/ia",
+      route: "/ia/add/create",
       icon: "/assets/icons/stars.svg",
     },
     {
@@ -115,11 +115,11 @@ export const navLinks = [
   ];
   
   export const transformationTypes = {
-    restore: {
-      type: "restore",
-      title: "Restore Image",
-      subTitle: "Refine images by removing noise and imperfections",
-      config: { restore: true },
+    create: {
+      type: "create",
+      title: "BOT IA",
+      subTitle: "Crea tu chatbot con IA que te lleven a tus objetivos",
+      config: { create: true },
       icon: "image.svg",
     },
     removeBackground: {

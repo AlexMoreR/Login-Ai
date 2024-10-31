@@ -1,6 +1,6 @@
-"use client"; // Esto habilita el componente para usar hooks como useState y manejar eventos en el lado del cliente
+'use client'; // Esto habilita el componente para usar hooks como useState y manejar eventos en el lado del cliente
 
-import { createInstance, verificarInstanciaActiva } from "@/actions/api-action"; // Asegúrate de tener la función verificarInstanciaActiva disponible
+import { createInstance, verificarInstanciaActiva, eliminarInstancia } from "@/actions/api-action"; // Asegúrate de tener la función eliminarInstancia disponible
 import { useEffect, useState } from "react";
 
 export default function FormInstance({ userId }: { userId: string }) {
@@ -44,6 +44,9 @@ export default function FormInstance({ userId }: { userId: string }) {
       if (result.success) {
         setInstanceName("");
         setInstanceExists(true); // Marca que la instancia ya existe
+
+        // Recargar la página después de crear la instancia
+        window.location.reload();
       }
     } catch (error) {
       setMessage("Hubo un error al procesar la solicitud.");
@@ -52,10 +55,45 @@ export default function FormInstance({ userId }: { userId: string }) {
     }
   };
 
+  // Función para eliminar la instancia
+  const handleDelete = async () => {
+    setLoading(true);
+    setMessage(null); // Limpia mensajes anteriores
+
+    try {
+      const result = await eliminarInstancia(userId); // Asegúrate de que la función eliminarInstancia esté implementada
+      setMessage(result.message);
+
+      if (result.success) {
+        setInstanceExists(false); // Actualiza el estado para indicar que la instancia ha sido eliminada
+      }
+    } catch (error) {
+      setMessage("Hubo un error al procesar la solicitud de eliminación.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="">
       {instanceExists ? (
-        <p className="text-green-700">Instancia Activa</p>
+        <div className="flex justify-between items-center">
+          <h1>Instancia Creada</h1>
+          <button
+            onClick={handleDelete}
+            disabled={loading}
+            className={`mt-4 w-8 h-8 rounded-md text-white font-semibold ${
+              loading ? "bg-gray-400" : "bg-red-600 hover:bg-red-700"
+            } transition duration-200 flex items-center justify-center`}
+            title="Eliminar Instancia"
+          >
+            {loading ? (
+              <span className="loader"></span> // Aquí puedes usar un ícono de carga o algún otro elemento
+            ) : (
+              <span className="text-white text-lg">&times;</span> // '×' como símbolo de eliminación
+            )}
+          </button>
+        </div>
       ) : (
         <>
           <h2 className="text-xl font-semibold mb-4">Nombre del Robot</h2>

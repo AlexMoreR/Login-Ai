@@ -2,6 +2,10 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 
 import { agregarApi } from "@/actions/api-action";
+import Image from "next/image"
+import Link from "next/link"
+import ConexionButton from "@/components/shared/conexion";
+import Header from "@/components/shared/header";
 
 const AdminPage = async () => {
   const session = await auth();
@@ -16,38 +20,18 @@ const AdminPage = async () => {
   }
 
   return (  
-    <div className="container">
-      {/* <pre>{JSON.stringify(session, null, 2)}</pre> */}
-
-      {/* Muestra el mensaje de éxito o error si existe */}
-
-      <div className="container"><form action={agregarApi} className="flex flex-col gap-y-p">
-        <div className="mb-4">
-          <input 
-          type="text"
-          name="url"
-          placeholder="Ingresa la url de Evolution"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <div className="mb-4">
-          <input 
-          type="text"
-          name="key"
-          placeholder="Ingresa la Apikey"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <input 
-            type="hidden" // Usa un campo oculto para enviar el ID del usuario
-            name="userId"
-            value={user?.id} // Ahora puedes usar el ID del usuario
-        />
-        <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">AGREGAR</button>
-      </form></div>
-
-      {/* <LogoutButton /> */}
+    <>
+      <Header 
+        title='Panel Administrativo'
+        subtitle='Puedes administrar cualquier operacion en la plataforma'
+      />
+    <div className="p-2">
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <ConexionButton />
+        {/* Agrega más botones o *cards* si es necesario */}
+      </div>
     </div>
+    </>
   );
 };
 export default AdminPage;

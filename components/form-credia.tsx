@@ -24,6 +24,7 @@ const OpenAICredentialManager: React.FC<OpenAICredentialComponentProps> = ({ use
   const [error, setError] = useState<string | null>(null);
   const [openAICredential, setOpenAICredential] = useState<OpenAICredential | null>(null);
   const [instanceData, setInstanceData] = useState<OpenAICredentialProps | null>(null); // Instancia
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // Estado para controlar el modal
   const [connectionStatus, setConnectionStatus] = useState<string | null>(null); // Estado de conexión
 
   // URL base de la API
@@ -56,7 +57,7 @@ const OpenAICredentialManager: React.FC<OpenAICredentialComponentProps> = ({ use
       const response = await fetch(`${baseUrl}/openai/creds/${instanceName}`, {
         method: 'GET',
         headers: {
-          apikey: instanceId, // Cambié el header por instanceId, asegúrate de que esto sea lo que se espera
+          apikey: instanceId,
         },
       });
 
@@ -66,11 +67,9 @@ const OpenAICredentialManager: React.FC<OpenAICredentialComponentProps> = ({ use
 
       const data = await response.json();
 
-      // Si la respuesta es un array vacío, no hay credenciales para esa instancia
       if (Array.isArray(data) && data.length > 0) {
-        setOpenAICredential(data[0]); // Toma la primera credencial
+        setOpenAICredential(data[0]);
       } else {
-        // Si no hay credenciales, mostramos un mensaje (esto es importante si el array está vacío)
         setOpenAICredential(null);
       }
     } catch (err) {
@@ -80,7 +79,6 @@ const OpenAICredentialManager: React.FC<OpenAICredentialComponentProps> = ({ use
     }
   };
 
-  // Crea una nueva credencial de OpenAI
   const createOpenAICredential = async (instanceName: string, instanceId: string, apiKey: string) => {
     if (!apiKey) {
       setError('La clave API no puede estar vacía.');
@@ -109,6 +107,7 @@ const OpenAICredentialManager: React.FC<OpenAICredentialComponentProps> = ({ use
       const data = await response.json();
       setOpenAICredential(data);
       setApiKey(''); // Limpiar el input después de crear
+      setIsModalOpen(false); // Cierra el modal después de crear
     } catch (err) {
       setError('Error al crear la credencial: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
@@ -116,15 +115,16 @@ const OpenAICredentialManager: React.FC<OpenAICredentialComponentProps> = ({ use
     }
   };
 
-  // Elimina la credencial
-  const deleteOpenAICredential = async (credId: string, instanceName: string, instanceId: string,) => {
+  const deleteOpenAICredential = async (credId: string, instanceName: string, instanceId: string) => {
     setLoading(true);
     setError(null);
     try {
+      console.log(instanceId);
       const response = await fetch(`${baseUrl}/openai/creds/${credId}/${instanceName}`, {
         method: 'DELETE',
         headers: {
-          apikey: instanceId, // Cambié apikey a instanceName
+          'apikey': instanceId,
+          'Content-Type': 'application/json',
         },
       });
 
@@ -140,53 +140,66 @@ const OpenAICredentialManager: React.FC<OpenAICredentialComponentProps> = ({ use
     }
   };
 
-  // Cargar las instancias y la credencial al montar el componente
   useEffect(() => {
-    fetchInstancesAndApiKey(); // Llama a la función para cargar instancias y credencial
+    fetchInstancesAndApiKey();
   }, [userId]);
 
   if (loading) return <p className="text-center text-lg text-gray-500">Cargando...</p>;
   if (error) return <p className="text-center text-lg text-red-500">{error}</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h3 className="">
-        Conectar IA: {instanceData?.instanceName}
-      </h3>
+    <div className="p-2 bg-white rounded-lg shadow-md">
 
-      {openAICredential ? (
-        <div className="space-y-4">
-          <div className="bg-gray-100 p-4 rounded-md shadow-sm">
-            <p className="font-bold text-gray-700">Credencial existente:</p>
-            <p className="text-gray-600">Nombre: {openAICredential.name}</p>
-            <p className="text-gray-600">API Key: {openAICredential.apiKey}</p>
-            <button
-              onClick={() => deleteOpenAICredential(openAICredential.id, instanceData!.instanceName, instanceData!.instanceId)}
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-            >
-              X
-            </button>
+        {openAICredential ? (
+          <div className="space-y-4">
+            <div className="bg-gray-100 p-1 rounded-md shadow-sm flex items-center justify-between">
+              <p className="text-gray-600 uppercase">{openAICredential.name}</p>  
+              <button
+                onClick={() => deleteOpenAICredential(openAICredential.id, instanceData!.instanceName, instanceData!.instanceId)}
+                className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+              >
+                X
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <h4 className="text-xl font-semibold text-gray-800">Crear nueva credencial</h4>
-          <div className="bg-white p-2 rounded-md shadow-sm border border-gray-200">
-            <input
-              type="text"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="sk-proj-..."
-              className=" p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none m-4"
-            />
-            <button
-              onClick={() => createOpenAICredential(instanceData!.instanceName, instanceData!.instanceId, apiKey)}
-              className=" bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              +
-            </button>
-          </div>
-        </div>
+        ): (
+        <>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            Crear OpenIA
+          </button>
+
+          {isModalOpen && (
+            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                <h4 className="text-xl font-semibold text-gray-800">Crear nueva credencial</h4>
+                <input
+                  type="text"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="sk-proj-..."
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none my-4"
+                />
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => createOpenAICredential(instanceData!.instanceName, instanceData!.instanceId, apiKey)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                  >
+                    Crear
+                  </button>
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="ml-2 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
