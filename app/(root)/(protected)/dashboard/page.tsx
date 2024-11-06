@@ -1,13 +1,15 @@
 import { auth } from "@/auth";
 import LogoutButton from "@/components/logout-button";
 import { db } from "@/lib/db";
-
+import WhatsAppInstanceStatus from "@/components/form-qr";
 
 import { currentUser } from "@/lib/auth";
 import { UserInfo } from "@/components/user-info";
 import FormInstance from "@/components/form-Instance";
-import WhatsAppInstanceStatus from "@/components/form-qr";
+
 import EnableToggleButton from "@/components/button-bot";
+import Link from "next/link";
+import { Button, buttonVariants } from "@/components/ui/button"
 
 
 export default async function DashboardPage() {
@@ -24,10 +26,13 @@ export default async function DashboardPage() {
 
   return (
     <>
+    <div className="flex space-x-4">
       <FormInstance userId={user.id} />
-      
       <EnableToggleButton userId={user.id} />
-      <WhatsAppInstanceStatus userId={user.id} />
+    </div>
+    <WhatsAppInstanceStatus userId={user.id} />
+    
+      
     </>
 
   );

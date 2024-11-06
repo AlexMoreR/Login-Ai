@@ -16,6 +16,78 @@
     success: boolean; // Indica si la conexión fue exitosa
   }
 
+  interface QRCodeResponse {
+    qr?: {
+        code: string; // Código QR en formato base64
+        pairingCode?: string; // Código de emparejamiento (opcional)
+    };
+    connectionState?: {
+        instance: {
+            state: string; // Estado de la conexión (e.g. 'open', 'closed')
+        };
+    };
+    success: boolean; // Indica si la operación fue exitosa
+    message?: string; // Mensaje opcional para el usuario
+  } 
+
+  //Server-Action Para generar el QR
+  export async function generarCodigoQR(instanceName: string, apiKey: string): Promise<QRCodeResponse> {
+    try {
+      // Obtener la clave de API y la URL del servidor desde la base de datos
+      const apiKeyRecord = await db.apiKey.findFirst();
+      if (!apiKeyRecord) {
+          throw new Error('No se encontró una clave API para este usuario.');
+      }
+      const { key: apiKey, url: serverUrl } = apiKeyRecord;
+
+      // Validación de campos
+      if (!instanceName || !apiKey) {
+          throw new Error('Todos los campos son obligatorios');
+      }
+
+      // Lógica para obtener el código QR desde tu API
+      const response = await fetch(`https://${serverUrl}/instance/connect/${instanceName}`, {
+          method: 'GET',
+          headers: {
+              apikey: apiKey,
+          },
+      });
+
+      if (!response.ok) {
+          throw new Error('Error al conectar con la instancia.');
+      }
+
+      const data = await response.json();
+
+      // Retornar el resultado basado en la respuesta de la API
+      if (data.base64) {
+          return {
+              success: true,
+              qr: {
+                  code: data.base64,
+                  pairingCode: data.pairingCode, // Si se incluye en la respuesta
+              },
+          };
+      } else if (data.instance.state === 'open') {
+          return {
+              success: true,
+              connectionState: {
+                  instance: {
+                      state: 'open',
+                  },
+              },
+          };
+      } else {
+          return {
+              success: false,
+              message: 'No se pudo generar el código QR.',
+          };
+      }
+    } catch (error: any) {   
+        return { success: false, message: error.message || 'Error al generar el código QR.' };
+    }
+  }
+
   export async function agregarApi(data: FormData) {
       const url = data.get('url') as string;
       const key = data.get('key') as string;
@@ -227,7 +299,6 @@
     }
   }
     
-
   // Función para verificar si el usuario ya tiene una instancia
   export async function verificarInstanciaActiva(userId: string) {
       const instanciaActiva = await db.instancias.findFirst({
@@ -338,7 +409,6 @@
   }
 
   // actions/createBotAction.ts
-
   export async function createBotAction(data: FormData) {
     const instanceName = data.get('instanceName') as string;
     const instanceId = data.get('instanceId') as string;
@@ -394,7 +464,6 @@
   }
 
   //Guardar mensaje del systema por usuario
-
   export async function agregarMensaje(data: FormData) {
     const message = data.get('message') as string;
     const userId = data.get('userId') as string;
@@ -426,14 +495,14 @@
     }
   }
 
-  //Edita el systemmensaje:
-
+  //Edita el Promt de IA Mensaje System:
   export async function obtenerMensajes(userId: string) {
     return await db.systemMessage.findMany({
       where: { userId },
     });
   }
 
+  //Edita el Promt de IA Mensaje System:
   export async function editarMensaje(data: FormData) {
     const id = data.get('id') as string;
     const message = data.get('message') as string;
@@ -449,6 +518,7 @@
     }
   }
 
+  //Edita el Promt de IA Mensaje System:
   export async function eliminarMensaje(id: string) {
     try {
       await db.systemMessage.delete({ where: { id } });

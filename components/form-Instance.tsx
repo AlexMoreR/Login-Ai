@@ -14,6 +14,7 @@ export default function FormInstance({ userId }: { userId: string }) {
     const checkInstance = async () => {
       const activeInstance = await verificarInstanciaActiva(userId);
       setInstanceExists(!!activeInstance); // Actualiza el estado si ya existe una instancia
+      setInstanceName(activeInstance?.instanceName || "");
     };
 
     checkInstance();
@@ -75,22 +76,25 @@ export default function FormInstance({ userId }: { userId: string }) {
   };
 
   return (
-    <div className="">
+    <div className="p-4">
       {instanceExists ? (
         <div className="flex justify-between items-center">
-          <h1>Instancia Creada</h1>
+          <h1 className="text-lg font-semibold">
+            Instancia Creada: <br />
+            <span className="text-gray-800">{instanceName}</span>
+          </h1>
           <button
             onClick={handleDelete}
             disabled={loading}
-            className={`mt-4 w-8 h-8 rounded-md text-white font-semibold ${
+            className={`mt-4 w-6 h-6 rounded-full text-white font-semibold ${
               loading ? "bg-gray-400" : "bg-red-600 hover:bg-red-700"
             } transition duration-200 flex items-center justify-center`}
             title="Eliminar Instancia"
           >
             {loading ? (
-              <span className="loader"></span> // Aquí puedes usar un ícono de carga o algún otro elemento
+              <span className="loader" /> // Icono de carga
             ) : (
-              <span className="text-white text-lg">&times;</span> // '×' como símbolo de eliminación
+              <span className="text-white text-base">&times;</span> // Símbolo de eliminación
             )}
           </button>
         </div>
@@ -99,7 +103,10 @@ export default function FormInstance({ userId }: { userId: string }) {
           <h2 className="text-xl font-semibold mb-4">Nombre del Robot</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="instanceName" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="instanceName"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Nombre de la Robot:
               </label>
               <input
@@ -108,13 +115,13 @@ export default function FormInstance({ userId }: { userId: string }) {
                 value={instanceName}
                 onChange={(e) => setInstanceName(e.target.value)}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
+                className="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 px-4 rounded-md text-white font-semibold ${
+              className={`w-full py-1 px-3 rounded-md text-white font-semibold ${
                 loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
               } transition duration-200`}
             >
@@ -123,7 +130,16 @@ export default function FormInstance({ userId }: { userId: string }) {
           </form>
         </>
       )}
-      {message && <p className={`mt-4 text-sm ${message.startsWith("El usuario") ? "text-red-500" : "text-green-600"}`}>{message}</p>}
+      {message && (
+        <p
+          className={`mt-4 text-sm ${
+            message.startsWith("El usuario") ? "text-red-500" : "text-green-600"
+          }`}
+        >
+          {message}
+        </p>
+      )}
     </div>
   );
+  
 }
