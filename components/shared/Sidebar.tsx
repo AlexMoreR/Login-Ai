@@ -19,7 +19,7 @@ const Sidebar = () => {
 
         <nav className="sidebar-nav">
           <ul className="sidebar-nav_elements">
-            {navLinks.map((link) => {
+            {navLinks.slice(0, 4).map((link) => {
               // Actualización de lógica para rutas activas
               const isActive = pathname === link.route || (link.route !== '/' && pathname.startsWith(link.route));
 
@@ -42,6 +42,31 @@ const Sidebar = () => {
                   </Link>
                 </li>
               );
+            })}
+
+          </ul>
+
+
+          <ul className="sidebar-nav_elements">
+            {navLinks.slice(4).map((link) => {
+              const isActive = link.route === pathname
+
+              return (
+                <li key={link.route} className={`sidebar-nav_element group ${
+                  isActive ? 'bg-purple-gradient text-white' : 'text-gray-700'
+                }`}>
+                  <Link className="sidebar-link" href={link.route}>
+                    <Image 
+                      src={link.icon}
+                      alt="logo"
+                      width={24}
+                      height={24}
+                      className={`${isActive && 'brightness-200'}`}
+                    />
+                    {link.label}
+                  </Link>
+                </li>
+              )
             })}
             <LogoutButton />
           </ul>

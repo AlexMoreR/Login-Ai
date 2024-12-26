@@ -15,6 +15,11 @@ export const navLinks = [
       icon: "/assets/icons/filter.svg",
     },
     {
+      label: "Flujos",
+      route: "/flow",
+      icon: "/assets/icons/image.svg",
+    },
+    {
       label: "Cuenta",
       route: "/profile",
       icon: "/assets/icons/profile.svg",
