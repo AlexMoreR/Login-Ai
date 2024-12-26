@@ -26,12 +26,15 @@ export default async function DashboardPage() {
 
   return (
     <>
-    <div className="flex space-x-4">
-      <FormInstance userId={user.id} />
-      <EnableToggleButton userId={user.id} />
-    </div>
+<div className="flex flex-col items-center justify-between  border rounded-lg shadow-lg">
+  <div className="">
+    <FormInstance userId={user.id} />
+  </div>
+  <div className="flex space-x-4">
+    <EnableToggleButton userId={user.id} />
     <WhatsAppInstanceStatus userId={user.id} />
-    
+  </div>
+</div>
       
     </>
 

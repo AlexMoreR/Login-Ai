@@ -9,7 +9,6 @@ const layout = ({ children }: {children: React.ReactNode}) => {
           <Sidebar />
           <MobileNav />
           {/* <pre>{JSON.stringify(session, null, 2)}</pre> */}
-
         <div className='root-container'>
             <div className="wrapper">
                 {children}

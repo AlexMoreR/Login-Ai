@@ -70,11 +70,13 @@ const EnableToggleButton: React.FC<EnableToggleButtonProps> = ({ userId }) => {
           apikey: instanceData.instanceId,
         },
         body: JSON.stringify({
-          enabled: !isEnabled,
-          url: 'https://autopro.verzay.co/webhook',
-          webhookByEvents: true,
-          webhookBase64: true,
-          events: ['MESSAGES_UPSERT'],
+          webhook: {
+            enabled: !isEnabled,
+            url: 'https://auto.aizenbots.com/webhook',
+            byEvents: true,
+            base64: true,
+            events: ['MESSAGES_UPSERT'],
+          },
         }),
       });
 

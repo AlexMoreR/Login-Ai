@@ -107,7 +107,7 @@ export default function FormInstance({ userId }: { userId: string }) {
                 htmlFor="instanceName"
                 className="block text-sm font-medium text-gray-700"
               >
-                Nombre de la Robot:
+                Nombre del Robot:
               </label>
               <input
                 type="text"

@@ -5,22 +5,17 @@ export const navLinks = [
       icon: "/assets/icons/home.svg",
     },
     {
-      label: "Reglas",
-      route: "/transformations/add/restore",
-      icon: "/assets/icons/image.svg",
-    },
-    {
       label: "Crear IA",
       route: "/ia/add/create",
       icon: "/assets/icons/stars.svg",
     },
     {
       label: "Herramientas",
-      route: "/transformations/add/recolor",
+      route: "/tools",
       icon: "/assets/icons/filter.svg",
     },
     {
-      label: "Perfil",
+      label: "Cuenta",
       route: "/profile",
       icon: "/assets/icons/profile.svg",
     },
@@ -122,13 +117,20 @@ export const navLinks = [
       config: { create: true },
       icon: "image.svg",
     },
-    removeBackground: {
-      type: "removeBackground",
-      title: "Background Remove",
-      subTitle: "Removes the background of the image using AI",
-      config: { removeBackground: true },
+    list: {
+      type: "list",
+      title: "Herramientas",
+      subTitle: "Crea tus herramientas de automatización.",
+      config: { list: true },
       icon: "camera.svg",
-    },
+    },    
+    new: {
+      type: "new",
+      title: "Crear Herramientas",
+      subTitle: "Crea tus herramientas de automatización.",
+      config: { list: true },
+      icon: "camera.svg",
+    },    
     fill: {
       type: "fill",
       title: "Generative Fill",

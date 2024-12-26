@@ -19,14 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}> {/* Cambiado a poppins.className */}
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
           {children}
-        </ThemeProvider>
       </body>
     </html>
   );
